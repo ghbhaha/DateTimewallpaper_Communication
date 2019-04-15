@@ -7,7 +7,7 @@
   //中心文字
   "centerText": [
     {
-      "type": "week", //类型 week 周 month月 day日 hour时 minute分 second秒 text 自定义文字
+      "type": "week", //类型 week 周 month月 day日 hour时 minute分 second秒 text 自定义文字 dateformat 时间格式
       //字符数组
       "array": [ 
         "周日",
@@ -17,6 +17,12 @@
         "周四",
         "周五",
         "周六"
+      ]
+    },
+    {
+      "type": "dateformat",
+      "array": [
+        "yyyy-MM-dd"
       ]
     },
     {
