@@ -20,7 +20,8 @@
       ]
     },
     {
-      "type": "dateformat",
+      //时间格式类型
+      "type": "dateformat", 
       "array": [
         "yyyy-MM-dd"
       ]
