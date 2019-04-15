@@ -1,6 +1,6 @@
 # DateTimewallpaper_Communication
 
-##自定义配置说明
+## 自定义配置说明
 
 ## 字段解释
 
