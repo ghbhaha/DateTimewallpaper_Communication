@@ -12,7 +12,7 @@
         display: -webkit-flex;
         display: flex;
         flex-direction: row;
-        flex-wrap :wrap
+        flex-wrap: wrap
     }
 
     #clockCanvas {
@@ -30,7 +30,7 @@
 <body>
 <div id="app">
     <canvas id="clockCanvas" width="480" height="480"></canvas>
-    <div  class="edit">
+    <div class="edit">
         <input class="form-control" id="confName" value="cusconf.json">
         <button class="btn btn-lg btn-success" onclick="downJson()">下载配置</button>
         <button class="btn btn-lg btn-primary" onclick="resetConfByUser()">应用配置</button>
@@ -39,7 +39,8 @@
 </div>
 
 </body>
-<script src="https://cdn.bootcss.com/FileSaver.js/2014-11-29/FileSaver.min.js"></script>
+
+<script src="https://cdn.bootcss.com/FileSaver.js/1.3.8/FileSaver.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
       integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -311,21 +312,26 @@
     $("#confTextArea").val(JSON.stringify(defConf, null, 4))
 
 
-    var cansize = 1
-    var width = document.documentElement.clientWidth
-    document.getElementById("clockCanvas").style.width = width * cansize +"px"
-    document.getElementById("clockCanvas").style.height = width * cansize+"px"
-    document.getElementById("clockCanvas").width = width * cansize *4
-    document.getElementById("clockCanvas").height = width * cansize*4
-
-    $(".edit").height(width)
-
+    resetSize()
     window.onresize = function () {
+        resetSize()
+    }
+
+    function resetSize() {
+        var canvasSize = 1
         var width = document.documentElement.clientWidth
-        document.getElementById("clockCanvas").style.width = width * cansize+"px"
-        document.getElementById("clockCanvas").style.height = width * cansize+"px"
-        document.getElementById("clockCanvas").width = width * cansize*4
-        document.getElementById("clockCanvas").height = width * cansize*4
+        if (isMobile()) {
+            canvasSize = 3
+            document.getElementById("clockCanvas").style.width = width + "px"
+            document.getElementById("clockCanvas").style.height = width + "px"
+            document.getElementById("clockCanvas").width = width * canvasSize
+            document.getElementById("clockCanvas").height = width * canvasSize
+            $(".edit").height(width)
+        } else {
+            canvasSize = 1 / 2
+            document.getElementById("clockCanvas").width = width * canvasSize
+            document.getElementById("clockCanvas").height = width * canvasSize
+        }
     }
 
 
@@ -371,10 +377,10 @@
 
     window.requestAnimFrame(this.play.bind(this));
 
-
     function downJson() {
-        var blob = new Blob([JSON.stringify(conf)], {type: ""});
-        saveAs(blob, $("#confName").val());
+        var blob = new Blob([JSON.stringify(conf)], {type: "text/json;charset=utf-8"});
+        var fileName = $("#confName").val()
+        saveAs(blob, fileName);
     }
 
     function resetConf() {
@@ -462,7 +468,7 @@
         }
 
         var fontSize = centerTextSize / allLength
-        ctx.font =(item.bold == 1 ? "bold " : "") + fontSize + "px Arial ";
+        ctx.font = (item.bold == 1 ? "bold " : "") + fontSize + "px Arial ";
         ctx.textBaseline = "middle";
         var fontHeight = ctx.measureText("测").width * 1.3
 
@@ -539,6 +545,16 @@
             if (new RegExp("(" + k + ")").test(fmt))
                 fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
         return fmt;
+    }
+
+
+    function isMobile() {
+        if ((navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))) {
+            return true
+        }
+        else {
+            return false
+        }
     }
 </script>
 
