@@ -11,7 +11,8 @@
     #app {
         display: -webkit-flex;
         display: flex;
-        flex-direction: row
+        flex-direction: row;
+        flex-wrap :wrap
     }
 
     #clockCanvas {
@@ -29,7 +30,7 @@
 <body>
 <div id="app">
     <canvas id="clockCanvas" width="480" height="480"></canvas>
-    <div class="edit">
+    <div  class="edit">
         <input class="form-control" id="confName" value="cusconf.json">
         <button class="btn btn-lg btn-success" onclick="downJson()">下载配置</button>
         <button class="btn btn-lg btn-primary" onclick="resetConfByUser()">应用配置</button>
@@ -310,15 +311,21 @@
     $("#confTextArea").val(JSON.stringify(defConf, null, 4))
 
 
-    var cansize = 2 / 3
+    var cansize = 1
     var width = document.documentElement.clientWidth
-    document.getElementById("clockCanvas").width = width * cansize
-    document.getElementById("clockCanvas").height = width * cansize
+    document.getElementById("clockCanvas").style.width = width * cansize +"px"
+    document.getElementById("clockCanvas").style.height = width * cansize+"px"
+    document.getElementById("clockCanvas").width = width * cansize *4
+    document.getElementById("clockCanvas").height = width * cansize*4
+
+    $(".edit").height(width)
 
     window.onresize = function () {
         var width = document.documentElement.clientWidth
-        document.getElementById("clockCanvas").width = width * cansize
-        document.getElementById("clockCanvas").height = width * cansize
+        document.getElementById("clockCanvas").style.width = width * cansize+"px"
+        document.getElementById("clockCanvas").style.height = width * cansize+"px"
+        document.getElementById("clockCanvas").width = width * cansize*4
+        document.getElementById("clockCanvas").height = width * cansize*4
     }
 
 
@@ -518,13 +525,13 @@
 
     function format(fmt, date) {
         var o = {
-            "M+": date.getMonth() + 1,  
-            "d+": date.getDate(), 
-            "h+": date.getHours(),    
-            "m+": date.getMinutes(),  
-            "s+": date.getSeconds(), 
-            "q+": Math.floor((date.getMonth() + 3) / 3),  
-            "S": date.getMilliseconds()  
+            "M+": date.getMonth() + 1,
+            "d+": date.getDate(),
+            "h+": date.getHours(),
+            "m+": date.getMinutes(),
+            "s+": date.getSeconds(),
+            "q+": Math.floor((date.getMonth() + 3) / 3),
+            "S": date.getMilliseconds()
         };
         if (/(y+)/.test(fmt))
             fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
