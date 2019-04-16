@@ -8,7 +8,7 @@
       "useCusFont": 1,
       "type": "dateformat",
       "array": [
-        "YYYY-MM-dd"
+        "yyyy-MM-dd"
       ]
     },
     {

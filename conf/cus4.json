@@ -3,7 +3,7 @@
     {
       "type": "dateformat",
       "array": [
-        "YYYY-MM-dd"
+        "yyyy-MM-dd"
       ]
     },
     {
