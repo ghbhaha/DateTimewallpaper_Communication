@@ -15,38 +15,33 @@
         flex-wrap: wrap
     }
 
-    #clockCanvas {
-    }
-
     .edit {
         display: -webkit-flex;
         display: flex;
         flex-direction: column;
         flex-grow: 1
     }
-
 </style>
 
 <body>
-<div id="app">
-    <canvas id="clockCanvas" width="480" height="480"></canvas>
-    <div class="edit">
-        <input class="form-control" id="confName" value="cusconf.json">
-        <button class="btn btn-lg btn-success" onclick="downJson()">下载配置</button>
-        <button class="btn btn-lg btn-primary" onclick="resetConfByUser()">应用配置</button>
-        <textarea class="form-control" style="flex-grow:1" id="confTextArea"></textarea>
+    <div id="app">
+        <canvas id="clockCanvas" width="480" height="480"></canvas>
+        <div class="edit">
+            <button class="btn btn-lg btn-success" style="margin :2px" onclick="downJson()">下载配置</button>
+            <button class="btn btn-lg btn-primary" style="margin :2px" onclick="resetConfByUser()">应用配置</button>
+            <input class="form-control" style="margin :2px" id="confName" value="cusconf.json">
+            <textarea class="form-control" style="margin :2px;flex-grow:1" id="confTextArea"></textarea>
+        </div>
     </div>
-</div>
 
 </body>
 
 <script src="https://cdn.bootcss.com/FileSaver.js/1.3.8/FileSaver.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
-      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"></script>
 
 <script>
     var defConf = {
@@ -309,17 +304,44 @@
         ]
     }
 
-    $("#confTextArea").val(JSON.stringify(defConf, null, 4))
+    var centerTextSize = 90
+    var circleTextSize = 50
+    var conf = null
+    var clockCanvas = null
+    var ctx = null
 
+    //保证不超出绘制区域
+    var centerScale = 1
 
-    resetSize()
+    window.requestAnimFrame = (function () {
+        return window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            window.oRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            function (/* function */ callback, /* DOMElement */ element) {
+                window.setTimeout(callback, 1000 / 60);
+            };
+    })();
+
     window.onresize = function () {
         resetSize()
     }
 
+    $(function () {
+        conf = defConf
+        clockCanvas = document.getElementById("clockCanvas")
+        ctx = clockCanvas.getContext("2d");
+        $("#confTextArea").val(JSON.stringify(defConf, null, 4))
+        resetConf()
+        resetSize()
+        play()
+    })
+
     function resetSize() {
         var canvasSize = 1
         var width = document.documentElement.clientWidth
+        var height = document.documentElement.clientHeight
         if (isMobile()) {
             canvasSize = 3
             document.getElementById("clockCanvas").style.width = width + "px"
@@ -334,27 +356,13 @@
         }
     }
 
-
-    var conf = defConf
-
-
-    var clockCanvas = document.getElementById("clockCanvas")
-    var ctx = clockCanvas.getContext("2d");
-
-    var monthIndex = 0
-    var dayIndex = 0
-    var weekIndex = 0
-    var hourIndex = 0
-    var minuteIndex = 0
-    var secondIndex = 0
-    var secondDelta = 0
-    var curDate
-    var centerTextSize = 90;
-    var circleTextSize = 50;
-
+    function downJson() {
+        var blob = new Blob([JSON.stringify(conf)], { type: "text/json;charset=utf-8" });
+        var fileName = $("#confName").val()
+        saveAs(blob, fileName);
+    }
 
     function resetConfByUser() {
-
         try {
             var confText = $("#confTextArea").val()
             conf = JSON.parse(confText)
@@ -363,24 +371,6 @@
         } catch (e) {
             alert("配置有错")
         }
-    }
-
-    resetConf()
-    window.requestAnimFrame = (function () {
-        return window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            function (callback) {
-                window.setTimeout(callback, 1000 / 60);
-            };
-    })();
-
-    window.requestAnimFrame(this.play.bind(this));
-
-    function downJson() {
-        var blob = new Blob([JSON.stringify(conf)], {type: "text/json;charset=utf-8"});
-        var fileName = $("#confName").val()
-        saveAs(blob, fileName);
     }
 
     function resetConf() {
@@ -396,84 +386,40 @@
             })
             offsetX += max;
         })
+
+        if (offsetX * 2 * 0.52 > 1080) {
+            centerScale = 1080 / (offsetX * 2 * 0.52)
+        }
     }
 
-
     function play() {
-        var myDate = new Date();
-
-        curDate = myDate
-
-        monthIndex = myDate.getMonth()
-        dayIndex = myDate.getDate() - 1;
-        weekIndex = myDate.getDay();
-        hourIndex = myDate.getHours() - 1;
-        minuteIndex = myDate.getMinutes() - 1;
-        secondIndex = myDate.getSeconds() - 1;
+        var curDate = new Date();
         ctx.clearRect(0, 0, clockCanvas.width, clockCanvas.height);
-
-        //处理动画
-        secondDelta = (myDate.getMilliseconds() % 1000) * 1.0 / (16 * 25);
-
-        if (secondDelta > 1) {
-            secondDelta = 1
-        }
-
-        secondDelta = secondDelta - 1;
-
-
-        if (hourIndex == -1) {
-            hourIndex = 23
-        }
-
-        if (minuteIndex == -1) {
-            minuteIndex = 59
-        }
-
-        if (secondIndex == -1) {
-            secondIndex = 59
-        }
-
         conf.centerText.forEach((item, index) => {
-            drawCenterText(clockCanvas, ctx, item, index, conf.centerText.length)
+            drawCenterText(curDate, item, index, conf.centerText.length)
         })
-
         conf.circleText.forEach((item) => {
-            drawCircleText(clockCanvas, ctx, item)
+            drawCircleText(curDate, item)
         })
-
         window.requestAnimFrame(this.play.bind(this));
     }
 
-    function drawCenterText(clockCanvas, ctx, item, index, allLength) {
+    function drawCenterText(curDate, item, index, allLength) {
         if (allLength == 0) {
             return
         }
-
-        var curIndex = 0
-        if (item.type == "week") {
-            curIndex = weekIndex
-        }
-
-        if (item.type == "ampm") {
-            curIndex = hourIndex > 11 ? 1 : 0
-        }
-
-        var scale = 0.52 * (clockCanvas.width / 1080);
+        var scale = centerScale * 0.52 * (clockCanvas.width / 1080);
         var width = clockCanvas.width;
         var height = clockCanvas.height;
-        var text = item.array[curIndex]
+        var text = item.array[getIndexByType(curDate, item).index]
         if (item.type == "dateformat") {
             text = format(text, curDate)
         }
-
         var fontSize = centerTextSize / allLength
         ctx.font = (item.bold == 1 ? "bold " : "") + fontSize + "px Arial ";
         ctx.textBaseline = "middle";
         var fontHeight = ctx.measureText("测").width * 1.3
-
         var offsetY = fontHeight * index - (fontHeight / 2) * (allLength - 1)
-
         ctx.save()
         ctx.translate((width) / 2, (height) / 2)
         ctx.scale(scale, scale)
@@ -481,44 +427,22 @@
         ctx.restore()
     }
 
-    function drawCircleText(clockCanvas, ctx, item) {
-        var scale = 0.52 * (clockCanvas.width / 1080);
+    function drawCircleText(curDate, item) {
+        var scale = centerScale * 0.52 * (clockCanvas.width / 1080);
         var width = clockCanvas.width;
         var height = clockCanvas.height;
-
         ctx.font = (item.bold == 1 ? "bold " : "") + circleTextSize + "px Arial "
         ctx.textBaseline = "middle";
-
-        var delta = 0
-        var curIndex = 0;
-        if (item.type == "month") {
-            curIndex = monthIndex
-        } else if (item.type == "day") {
-            curIndex = dayIndex
-        } else if (item.type == "hour") {
-            curIndex = hourIndex % item.array.length
-        } else if (item.type == "minute") {
-            delta = secondIndex == -1 ? secondDelta : 0
-            curIndex = minuteIndex
-        } else if (item.type == "second") {
-            delta = secondDelta
-            curIndex = secondIndex
-        } else if (item.type == "week") {
-            curIndex = weekIndex
-        }
-
-
+        var curIndex = getIndexByType(curDate, item).index;
+        var delta = getIndexByType(curDate, item).delta;
         var addAngle = 360 / item.array.length;
         var startAngle = -curIndex * addAngle - addAngle * delta;
-
         item.array.forEach((text, index) => {
-
             if (curIndex == index) {
                 ctx.fillStyle = "black";
             } else {
                 ctx.fillStyle = "gray";
             }
-
             ctx.save()
             ctx.translate((width) / 2, (height) / 2)
             ctx.rotate(startAngle * Math.PI / 180)
@@ -527,6 +451,61 @@
             ctx.fillText(text, item.offsetX, 0);
             ctx.restore()
         })
+    }
+
+    function getIndexByType(curDate, item) {
+        var monthIndex = curDate.getMonth()
+        var dayIndex = curDate.getDate() - 1
+        var weekIndex = curDate.getDay()
+        var hourIndex = curDate.getHours() - 1
+        var minuteIndex = curDate.getMinutes() - 1
+        var secondIndex = curDate.getSeconds() - 1
+        //处理动画
+        var secondDelta = (curDate.getMilliseconds() % 1000) * 1.0 / (16 * 25)
+        if (secondDelta > 1) {
+            secondDelta = 1
+        }
+        secondDelta = secondDelta - 1;
+        if (hourIndex == -1) {
+            hourIndex = 23
+        }
+        if (minuteIndex == -1) {
+            minuteIndex = 59
+        }
+        if (secondIndex == -1) {
+            secondIndex = 59
+        }
+        var curIndex = 0
+        var delta = 0
+        if (item.type == "week") {
+            curIndex = weekIndex
+        } else if (item.type == "ampm") {
+            curIndex = hourIndex > 11 ? 1 : 0
+        } else if (item.type == "month") {
+            curIndex = monthIndex
+        } else if (item.type == "day") {
+            curIndex = dayIndex
+        } else if (item.type == "hour") {
+            curIndex = hourIndex % item.array.length
+        } else if (item.type == "hour_23_23") {
+            hourIndex = hourIndex + 1;
+            if (hourIndex == 23) {
+                curIndex = 0;
+            } else if (hourIndex % 2 == 1) {
+                curIndex = (hourIndex + 1) / 2
+            } else {
+                curIndex = hourIndex / 2;
+            }
+        } else if (item.type == "minute") {
+            delta = secondIndex == -1 ? secondDelta : 0
+            curIndex = minuteIndex
+        } else if (item.type == "second") {
+            delta = secondDelta
+            curIndex = secondIndex
+        }
+        return {
+            "index": curIndex, "delta": delta
+        }
     }
 
     function format(fmt, date) {
@@ -546,7 +525,6 @@
                 fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
         return fmt;
     }
-
 
     function isMobile() {
         if ((navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))) {
