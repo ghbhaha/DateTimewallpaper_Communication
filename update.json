@@ -1,6 +1,6 @@
 {
-    "verCode":17,
-    "verName":"2.04",
+    "verCode":18,
+    "verName":"2.05",
     "info":"新增农历类型 生肖lunarAnimal 农历月 lunarMonth 农历日 lunarDay\n日期格式化新增 \"LA LM LD\"\n新增顺时针旋转参数 clockwise\n开启部分手机硬件加速，有问题请及时反馈",
     "downUrl":"https://www.coolapk.com/apk/223332"
 }
