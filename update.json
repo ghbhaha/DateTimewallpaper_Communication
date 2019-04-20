@@ -1,1 +1,6 @@
-{"verCode":16,"verName":"2.03","info":"新增时辰支持，类型为\"hour_23_23\"\n修复中间文字不居中\n优化配置重新选择生效\n优化耗电","downUrl":"https://www.coolapk.com/apk/223332"}
+{
+    "verCode":17,
+    "verName":"2.04",
+    "info":"新增农历类型 生肖lunarAnimal 农历月 lunarMonth 农历日 lunarDay\n日期格式化新增 \"LA LM LD\"\n新增顺时针旋转参数 clockwise\n开启部分手机硬件加速，有问题请及时反馈",
+    "downUrl":"https://www.coolapk.com/apk/223332"
+}
