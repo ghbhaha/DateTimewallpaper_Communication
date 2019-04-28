@@ -1,6 +1,6 @@
 {
-    "verCode":21,
-    "verName":"2.21",
-    "info":"新增多配置，三击壁纸即可在配置间切换",
-    "downUrl":"https://github.com/ghbhaha/DateTimewallpaper_Communication/releases/tag/2.21"
+    "verCode":24,
+    "verName":"2.30",
+    "info":"新增本地导入\n新增网络导入官方配置，方便省事\n新增永动模式开关\n增百变轮盘开关\n后台隐藏重新加回",
+    "downUrl":"https://github.com/ghbhaha/DateTimewallpaper_Communication/releases/download/2.30/DateTimeWallPaper_24-2.30-2019_04_28_20_39.apk"
 }
